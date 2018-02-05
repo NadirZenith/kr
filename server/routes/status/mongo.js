@@ -22,7 +22,7 @@ const handleDbResponse = (err, tag, res) => {
 
     return false;
   }
-  res.json({ msg: 'tag saved', tag });
+  res.json({ result: tag, msg: 'success: ' });
 
   return true;
 };
@@ -35,6 +35,11 @@ router.route('/create').get((req, res) => {
   });
 
   tag.save((err, _tag) => handleDbResponse(err, _tag, res));
+});
+
+// list
+router.route('/list').get((req, res) => {
+  Tag.find((err, _tags) => handleDbResponse(err, _tags, res));
 });
 
 export default router;

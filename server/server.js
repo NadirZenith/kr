@@ -14,7 +14,7 @@ import mongoose from './utils/mongoose';
 
 
 import wpconfig from '../config/webpack.config.dev';
-import config from './config';
+import config from '../dist/config';
 import mainRoutes from './routes/main.routes';
 import * as tickManager from './utils/krakenTick';
 
