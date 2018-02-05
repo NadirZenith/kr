@@ -1,4 +1,4 @@
-import config from '../../dist/config';
+import config from '../config';
 
 export const checkAuthentication = (req, res, next) => {
   if (req.isAuthenticated()) {

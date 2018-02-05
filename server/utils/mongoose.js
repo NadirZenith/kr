@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import config from '../../dist/config';
+import config from '../config';
 
 let tags;
 
