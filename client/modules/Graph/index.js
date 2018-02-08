@@ -1,56 +1,105 @@
-import React from "react";
-import * as api from "./api"
-import {
-    BrowserRouter as Router,
-    Route,
-    Link,
-    Switch,
-    Redirect
-} from 'react-router-dom'
-// export default function () {
-//     console.log('it works');
-// }
+import React from 'react';
+import { Route, Link } from 'react-router-dom';
+import { timeFormat, timeParse } from "d3-time-format";
+import Chart from './Chart2';
+import * as api from './api';
 
-const TF = (props) => {
-    // this.props.match.params.
-    console.log(props.match.params.tf);
-    // console . log(arguments);
-    return (
-        <p>.. TFG{props.match.params.tf} ..</p>
-    )
+// const parseDate = timeParse("%Q");
+
+function parseData(data) {
+  const final = [];
+  data.forEach((row) => {
+    const date = new Date(row[0] * 1000);
+    const d = {};
+    d.date = date;
+    d.open = +row[1];
+    d.high = +row[2];
+    d.low = +row[3];
+    d.close = +row[4];
+    d.volume = +row[6];
+
+    final.push(d);
+  });
+
+  // console.log('------>', final);
+  return final;
 }
-
 
 class Graph extends React.Component {
+  constructor(props) {
+    super(props);
+    // console.log(this.props);
 
-    // constructor(props) {
-    //     super(props)
-    //     console.log(this.props)
-    // }
-    componentDidMount(){
-        // alert('hi');
-        api.getStatus(resp => {console.log(resp)})
+    this.state = {
+      type: 'svg',
+      data: [],
+      graphData: '',
+      active: 'no',
+      pair: 'XETHZEUR',
+      interval: '1', // 1 (default), 5, 15, 30, 60, 240, 1440, 10080, 21600
+    };
+  }
+
+  componentDidMount() {
+    // alert('hi');
+    api.getStatus(resp => this.handleStatusResp(resp));
+    // api.getStatus(resp => handleStatusResp(resp).bind(this));
+  }
+
+  handleStatusResp(resp) {
+    const active = (resp.code === 200) ? 'active' : 'off';
+    this.setState({ active });
+
+    api.getGraph({ pair: this.state.pair, interval: this.state.interval }, resp => this.handleChartResp(resp));
+  }
+
+  handleChartResp(resp) {
+    const str = JSON.stringify(resp.result, null, 2);
+    this.setState({ graphData: str });
+
+    const result = resp.result[this.state.pair];
+    // console.log(result);
+
+    const data = parseData(result);
+
+    this.setState({ data });
+  }
+
+  render() {
+    let ChartVar = null;
+    if (this.state.data.length > 0) {
+      ChartVar = <Chart type={this.state.type} data={this.state.data}/>;
     }
 
-    render() {
 
-        return (
-            <div>
-                <ul>
-                    <li><Link to={`${this.props.match.url}/1m`}>1m</Link></li>
-                    <li><Link to={`${this.props.match.url}/5m`}>5m</Link></li>
-                    <li><Link to={`${this.props.match.url}/15m`}>15m</Link></li>
-                </ul>
+    return (
+      <div>
+        <ul>
+          <li><Link to={`${this.props.match.url}/1m`}>1m</Link></li>
+          <li><Link to={`${this.props.match.url}/5m`}>5m</Link></li>
+          <li><Link to={`${this.props.match.url}/15m`}>15m</Link></li>
+        </ul>
 
-                <hr/>
+        <hr/>
 
-                <Route exact path={this.props.match.url} render={() => (
-                    <h3>Please select a time frame.</h3>
-                )}/>
-                <Route path={`${this.props.match.url}/:tf`} component={TF}/>
-            </div>
-        )
-    }
+        <Route
+          exact
+          path={this.props.match.url}
+          render={() => (
+            <h3>Please select a time frame.</h3>
+          )}
+        />
+        <div> -{this.state.active}-</div>
+        {ChartVar}
+        <pre> -{this.state.graphData}-</pre>
+      </div>
+    );
+  }
 }
 
-export default Graph
+Graph.defaultProps = {
+  cityList: [],
+  provinceList: [],
+};
+
+export default Graph;
