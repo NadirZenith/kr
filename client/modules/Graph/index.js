@@ -1,7 +1,12 @@
 import React from 'react';
 import { Route, Link } from 'react-router-dom';
 import { timeFormat, timeParse } from "d3-time-format";
-import Chart from './Chart2';
+// import Chart from './OHLCChartWithElderImpulseIndicator';
+// import Chart from './CandleStickChartWithHoverTooltip';
+// import Chart from './CandleStickChart';
+// import Chart from './CandleStickChartForDiscontinuousIntraDay';
+import Chart from './CandleStickChartForContinuousIntraDay';
+// import Chart from './CandleStickChartDark';
 import * as api from './api';
 
 // const parseDate = timeParse("%Q");
@@ -65,6 +70,12 @@ class Graph extends React.Component {
     this.setState({ data });
   }
 
+  changeTf = (e) => {
+    e.preventDefault();
+    // alert(this.props.match);
+    console.log(this.props.match);
+  }
+
   render() {
     let ChartVar = null;
     if (this.state.data.length > 0) {
@@ -75,9 +86,9 @@ class Graph extends React.Component {
     return (
       <div>
         <ul>
-          <li><Link to={`${this.props.match.url}/1m`}>1m</Link></li>
-          <li><Link to={`${this.props.match.url}/5m`}>5m</Link></li>
-          <li><Link to={`${this.props.match.url}/15m`}>15m</Link></li>
+          <li><Link to={`${this.props.match.url}/1m`} onClick={this.changeTf}>1m</Link></li>
+          <li><Link to={`${this.props.match.url}/5m`} onClick={this.changeTf}>5m</Link></li>
+          <li><Link to={`${this.props.match.url}/15m`} onClick={this.changeTf}>15m</Link></li>
         </ul>
 
         <hr/>
@@ -97,9 +108,9 @@ class Graph extends React.Component {
   }
 }
 
-Graph.defaultProps = {
-  cityList: [],
-  provinceList: [],
-};
+// Graph.defaultProps = {
+//   cityList: [],
+//   provinceList: [],
+// };
 
 export default Graph;
